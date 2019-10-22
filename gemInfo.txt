@@ -1,0 +1,10 @@
+Healing Gems: Rabbit Tank Diamond Ninja Lock
+Attack Buff Gems: Gorilla Hawk Gatling Comic Dragon
+
+
+Best Matches
+Rabbit Tank : Heals and does damage
+Gorilla Diamond : Reduces enemy attack
+Hawk Gatling : Your next attacks do extra damage
+Ninja Comic : Heals and does damage
+Dragon Lock : Does damage based on enemy % health
