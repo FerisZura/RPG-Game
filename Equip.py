@@ -6,16 +6,16 @@ def print_gem(gemCount, equipped, string):
     if equipped == 0:
         if gemCount > 0 and gemCount < 3:
             print(string)
-        elif gemCount >= 3 and gemCount < 9:
+        elif gemCount >= 3 and gemCount < 6:
             print(string + " LV2")
-        elif gemCount >= 9:
+        elif gemCount >= 6:
             print(string + " LV3")
     if equipped > 0:
         if gemCount > 0 and gemCount < 3:
             print(string + " (E)")
-        elif gemCount >= 3 and gemCount < 9:
+        elif gemCount >= 3 and gemCount < 6:
             print(string + " LV2 (E)")
-        elif gemCount >= 9:
+        elif gemCount >= 6:
             print(string + " LV3 (E)")
 
 
@@ -29,10 +29,10 @@ def select_gem(gemCount, equipped, gemName, numberEquipped):
             if gemCount > 0 and gemCount < 3:
                 input("You have equipped the {} gem".format(gemName))
                 return 1, numberEquipped + 1
-            elif gemCount >= 3 and gemCount < 9:
+            elif gemCount >= 3 and gemCount < 6:
                 input("You have equipped the {} gem (LV2)".format(gemName))
                 return 2, numberEquipped + 1
-            elif gemCount >= 9:
+            elif gemCount >= 6:
                 input("You have equipped the {} gem (LV3)".format(gemName))
                 return 3, numberEquipped + 1
     elif equipped > 0:
