@@ -70,8 +70,8 @@ def gemsMenu(player, gemList, currentEnemy):
     LV3GEMHEAL = [4, 6]
     HEALLEVELS = [LV1GEMHEAL, LV2GEMHEAL, LV3GEMHEAL]
     LV1ATTACKRAISE = 2
-    LV2ATTACKRAISE = 5
-    LV3ATTACKRAISE = 10
+    LV2ATTACKRAISE = 4
+    LV3ATTACKRAISE = 6
     ATTACKRAISELEVELS = [LV1ATTACKRAISE, LV2ATTACKRAISE, LV3ATTACKRAISE]
     HEALINGGEMLIST = ["rabbit", "tank", "diamond", "ninja", "lock"]
     ATTACKGEMLIST = ["gorilla", "hawk", "gatling", "comic", "dragon"]
@@ -272,11 +272,11 @@ def gemsMenu(player, gemList, currentEnemy):
     #damage is done down below
     def hawk_gatling_effect_charge(combinedGemLevel):
         if combinedGemLevel == 1:
-            player.hawkGatlingCharge = [2, 10, 15]
+            player.hawkGatlingCharge = [2, 5, 10]
         if combinedGemLevel == 2:
-            player.hawkGatlingCharge = [2, 25, 30]
+            player.hawkGatlingCharge = [2, 20, 25]
         if combinedGemLevel == 3:
-            player.hawkGatlingCharge = [3, 40, 50]
+            player.hawkGatlingCharge = [3, 25, 35]
         input("(effect: next {} attacks deal bonus damage)".format(player.hawkGatlingCharge[0]))
 
     def ninja_comic_effect(combinedGemLevel):
@@ -293,7 +293,7 @@ def gemsMenu(player, gemList, currentEnemy):
         if combinedGemLevel == 2:
             ham_point_distributor([1, 5, 10, 30])
         if combinedGemLevel == 3:
-            ham_point_distributor([3, 7, 20, 60])
+            ham_point_distributor([3, 7, 20, 80])
 
     def dragon_lock_effect(combinedGemLevel):
         def dragon_vortex_finish(damageList, threshold):
@@ -318,9 +318,9 @@ def gemsMenu(player, gemList, currentEnemy):
         if combinedGemLevel == 1:
             dragon_vortex_finish([1, 8, 15], [0.7, 0.5, 0.2])
         if combinedGemLevel == 2:
-            dragon_vortex_finish([5, 15, 30], [0.75, 0.5, 0.25])
+            dragon_vortex_finish([5, 15, 30], [0.75, 0.55, 0.25])
         if combinedGemLevel == 3:
-            dragon_vortex_finish([10, 30, 60], [0.8, 0.5, 0.3])
+            dragon_vortex_finish([10, 30, 75], [0.8, 0.6, 0.3])
 
 
     # checks if best match
@@ -366,11 +366,11 @@ def game(player):
 
     # sets up enemies
     forestEnemy = enemyType(5, 10, 2, 3, 5, 10, "Snake")
-    forestBoss = enemyType(25, 25, 5, 5, 10, 15, "COBRA")
-    caveEnemy = enemyType(25, 35, 4, 7, 10, 15, "Small Bat")
-    caveBoss = enemyType(100, 100, 12, 12, 80, 100, "GIANT BAT")
-    swampEnemy = enemyType(80, 100, 15, 20, 20, 25, "Lizard")
-    swampBoss = enemyType(300, 300, 20, 20, 200, 200, "CROCODILE")
+    forestBoss = enemyType(25, 25, 5, 5, 50, 50, "COBRA")
+    caveEnemy = enemyType(25, 35, 4, 7, 10, 20, "Small Bat")
+    caveBoss = enemyType(100, 100, 12, 12, 200, 200, "GIANT BAT")
+    swampEnemy = enemyType(80, 100, 15, 20, 50, 70, "Lizard")
+    swampBoss = enemyType(300, 300, 20, 20, 500, 500, "CROCODILE")
 
 
     # gem initializing, makes list of all equipped gems
@@ -404,14 +404,17 @@ def game(player):
             healAmount = random.randint(healRange[0], healRange[1])
             currentEnemy.health += healAmount
             print("{} healed for {} health".format(currentEnemy.name, healAmount))
+            print()
 
         def boss_attack_buff(buffRange):
             buffAmount = random.randint(buffRange[0], buffRange[1])
             currentEnemy.attack += buffAmount
             print("{} raised its attack by {}".format(currentEnemy.name, buffAmount))
+            print()
 
         def boss_charge():
             print("{} seems to be charging a strong attack".format(currentEnemy.name))
+            print()
             return 1
 
         def boss_use_charge(flatDmg):
@@ -420,9 +423,11 @@ def game(player):
             if percentDmg > flatDmg:
                 player.health -= percentDmg
                 print("Took {} damage!!".format(percentDmg))
+                print()
             else:
                 player.health -= percentDmg
                 print("Took {} damage!!".format(flatDmg))
+                print()
             return 0
 
 
@@ -638,15 +643,15 @@ def game(player):
                 goldThisRun += currentEnemy.gold
                 if player.caveFirstClear == True:
                     player.caveFirstClear = False
-                    player.gachaToken += 5
+                    player.gachaToken += 3
                     player.teleporter = 1
                     input("You examine the body of the giant bat...")
-                    input("You found 5 gacha tokens!")
+                    input("You found 3 gacha tokens!")
                     input("You found a teleporter!")
                     input("With this, you can teleport back to the main menu at any time")
                     input("You can also skip straight to the boss of stages you've cleared previously")
                 elif player.caveFirstClear == False:
-                    caveBossDrop = random.randint(2,5)
+                    caveBossDrop = random.randint(1,3)
                     player.gachaToken += caveBossDrop
                     input("You examine the body of the giant bat...")
                     input("You found {} gacha tokens!" .format(caveBossDrop))
