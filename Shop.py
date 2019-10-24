@@ -67,16 +67,19 @@ def shop(player):
     woodSword = weaponn("Wood Sword", 75, False, 3, 6)
     ironSword = weaponn("Iron Sword", 500, False, 8, 10)
     platSword = weaponn("Platinum Sword", 1500, False, 30, 40)
+    finalSword = weaponn("Final Sword", 2200, False, 40, 50)
 
     # hats
     woodHelmet = armour("Wood Helmet", 50, False, 8)
     ironHelmet = armour("Iron Helmet", 400, False, 18)
     platHelmet = armour("Platinum Helmet", 1000, False, 30)
+    finalHelmet = armour("Final Helmet", 2000, False, 50)
 
     # armours
     woodArmour = armour("Wood Armour", 100, False, 10)
     ironArmour = armour("Iron Armour", 1000, False, 22)
     platArmour = armour("Platinum Armour", 2000, False, 50)
+    finalArmour = armour("Armour Armour", 2500, False, 75)
 
     # accessories (maybe add an armour as the last one here)
     regenBand = accessory("Regen Band", 1000, False, 5)
@@ -94,7 +97,10 @@ def shop(player):
         buyQuantity = integer_input(100)
         if player.gold >= potionCost * buyQuantity:
             player.gold -= potionCost * buyQuantity
-            player.healthPotion += buyQuantity
+            if potionName == "health potion":
+                player.healthPotion += buyQuantity
+            elif potionName == "max health potion":
+                player.maxHealthPotion += buyQuantity
             input("Bought {} {}s" .format(buyQuantity, potionName))
         else:
             input("You do not have enough money")
@@ -119,6 +125,8 @@ def shop(player):
                         buy(player, ironSword, "weapon")
                     elif player.weaponTier == 2:
                         buy(player, platSword, "weapon")
+                    elif player.weaponTier == 3:
+                        buy(player, finalSword, "weapon")
                 elif secondInput == 2:
                     if player.hatTier == 0:
                         buy(player, woodHelmet, "hat")
@@ -126,6 +134,8 @@ def shop(player):
                         buy(player, ironHelmet, "hat")
                     elif player.hatTier == 2:
                         buy(player, platHelmet, "hat")
+                    elif player.hatTier == 3:
+                        buy(player, finalHelmet, "hat")
                 elif secondInput == 3:
                     if player.armourTier == 0:
                         buy(player, woodArmour, "armour")
@@ -133,6 +143,8 @@ def shop(player):
                         buy(player, ironArmour, "armour")
                     elif player.armourTier == 2:
                         buy(player, platArmour, "armour")
+                    elif player.armourTier == 3:
+                        buy(player, finalHelmet, "armour")
                 elif secondInput == 4:
                     if player.accessoryTier == 0:
                         buy(player, regenBand, "accessory")
@@ -173,12 +185,19 @@ def shop(player):
         player.maxHealth += ironHelmet.healthIncrease
     elif player.hatTier == 3:
         player.maxHealth += platHelmet.healthIncrease
+    elif player.hatTier == 4:
+        player.maxHealth += finalHelmet.healthIncrease
     if player.armourTier == 1:
         player.maxHealth += woodArmour.healthIncrease
     elif player.armourTier == 2:
         player.maxHealth += ironArmour.healthIncrease
     elif player.armourTier == 3:
-        player.maxHealth += platHelmet.healthIncrease
+        player.maxHealth += platArmour.healthIncrease
+    elif player.armourTier == 4:
+        player.maxHealth += finalArmour.healthIncrease
+    if player.crocodileHeart == 1:
+        player.maxHealth += 25
+        #if you update this please update in game too
 
     # attack
     if player.weaponTier == 0:
@@ -193,6 +212,9 @@ def shop(player):
     elif player.weaponTier == 3:
         player.minAttack = platSword.minAttack
         player.maxAttack = platSword.maxAttack
+    elif player.weaponTier == 4:
+        player.minAttack = finalSword.minAttack
+        player.maxAttack = finalSword.maxAttack
 
     # regen
     if player.accessoryTier == 0:

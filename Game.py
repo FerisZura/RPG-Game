@@ -366,11 +366,14 @@ def game(player):
 
     # sets up enemies
     forestEnemy = enemyType(5, 10, 2, 3, 5, 10, "Snake")
-    forestBoss = enemyType(25, 25, 5, 5, 50, 50, "COBRA")
+    forestBoss = enemyType(25, 25, 5, 5, 75, 75, "COBRA")
     caveEnemy = enemyType(25, 35, 4, 7, 10, 20, "Small Bat")
-    caveBoss = enemyType(100, 100, 12, 12, 200, 200, "GIANT BAT")
-    swampEnemy = enemyType(80, 100, 15, 20, 50, 70, "Lizard")
-    swampBoss = enemyType(300, 300, 20, 20, 500, 500, "CROCODILE")
+    caveBoss = enemyType(100, 100, 12, 12, 250, 250, "GIANT BAT")
+    swampEnemy = enemyType(80, 100, 10, 15, 50, 70, "Lizard")
+    swampBoss = enemyType(300, 300, 20, 20, 700, 700, "CROCODILE")
+    iceLandsBoss1 = enemyType(1000, 1000, 25, 25, 0, 0, "ICE BIRD")
+    iceLandsBoss2 = enemyType(1000, 1000, 0, 0, 0, 0, "EGG")
+    iceLandsBoss3 = enemyType(600, 600, 25, 25, 5000, 5000, "ICE BIRD (REVIVE)")
 
 
     # gem initializing, makes list of all equipped gems
@@ -392,6 +395,7 @@ def game(player):
     def fighting_enemy_phase():
         # for some reason health pot values are here
         HEALTHPOTIONHEALAMOUNT = 50
+        eggCharge = 0
 
         #boss attacks and hawk gatling
         def hawk_gatling_effect_damage():
@@ -417,10 +421,15 @@ def game(player):
             print()
             return 1
 
+        def boss_icicle_charge():
+            print("An icicle is coming! It will strike next turn!")
+            print()
+            return 2
+
         def boss_use_charge(flatDmg):
             #either does half of player's health, or a flat amount, whichever's higher (percent should always be higher unless if weird stuff happens)
-            percentDmg = round(player.maxHealth/2)
-            if percentDmg > flatDmg:
+            percentDmg = player.maxHealth//2
+            if percentDmg > flatDmg and currentEnemy.name != "ICE BIRD (REVIVE)":
                 player.health -= percentDmg
                 print("Took {} damage!!".format(percentDmg))
                 print()
@@ -428,6 +437,11 @@ def game(player):
                 player.health -= percentDmg
                 print("Took {} damage!!".format(flatDmg))
                 print()
+            return 0
+
+        def boss_use_icicle_charge(dmg):
+            player.health -= dmg
+            print("The icicle does {} damage!" .format(dmg))
             return 0
 
 
@@ -475,7 +489,10 @@ def game(player):
                         input("You do not own this item")
                         skipEnemyPhase = True
                 if itemInput == 3:
-                    if player.teleporter == 0:
+                    if player.glacialStorm == True:
+                        player.glacialStorm = False
+                        print("You teleport to safety")
+                    elif player.teleporter == 0:
                         input("???")
                     elif player.teleporter > 0:
                         def teleporter_text():
@@ -517,6 +534,11 @@ def game(player):
                 if itemInput == 4:
                     skipEnemyPhase = True
 
+            #glacial storm phase
+            if player.glacialStorm == True:
+                player.health -= 10
+                print("The glacial storm does 10 damage!")
+
             # enemy phase (skip if they dead or user did not make action)
             if currentEnemy.health <= 0:
                 skipEnemyPhase = True
@@ -545,14 +567,75 @@ def game(player):
                         player.health -= currentEnemy.attack
                         print("Took {} damage!".format(currentEnemy.attack))
                         print()
+                elif currentEnemy.name == "ICE BIRD":
+                    #70% attack
+                    #20% heal for 70
+                    #10% glacial storm
+                    rando = random.randint(1,10)
+                    if rando <= 1 and player.glacialStorm == False:
+                        player.glacialStorm = True
+                        print("ICE BIRD summons a glacial storm!")
+                        input("(you can teleport out)")
+                    elif rando <= 3:
+                        boss_heal([60, 80])
+                    else:
+                        player.health -= currentEnemy.attack
+                        print("Took {} damage!".format(currentEnemy.attack))
+                        print()
+                elif currentEnemy.name == "EGG":
+                    #charges 10dmg per turn
+                    eggCharge += 1
+                    print("You feel a presence from inside the egg")
+                    print()
+                elif currentEnemy.name == "ICE BIRD (REVIVE)":
+                    #60% attack
+                    #10% heal
+                    #10% large attack
+                    #10% icicle
+                    #10% glacial storm
+                    rando = random.randint(1,10)
+                    if currentEnemy.attackCharge == 2:
+                        #icicle charge use. bird can still attack this turn
+                        currentEnemy.attackCharge = boss_use_icicle_charge(30)
+                    if currentEnemy.attackCharge == 1:
+                        #large attack charge use. this counts as the attack
+                        currentEnemy.attackCharge = boss_use_charge(60)
+                    elif rando <= 1 and player.glacialStorm == False:
+                        player.glacialStorm = True
+                        print("ICE BIRD summons a glacial storm!")
+                    elif rando <2:
+                        boss_heal([60, 80])
+                    elif rando <3:
+                        currentEnemy.attackCharge = boss_charge()
+                    elif rando <4:
+                        currentEnemy.attackCharge = boss_icicle_charge()
+                    else:
+                        player.health -= currentEnemy.attack
+                        print("Took {} damage!".format(currentEnemy.attack))
+                        print()
+
+
+
                 # for non-bosses
                 else:
                     player.health -= currentEnemy.attack
                     print("Took {} damage!".format(currentEnemy.attack))
                     print()
 
+
+
         # enemy defeat
-        if currentEnemy.health <= 0:
+        if currentEnemy.health <= 0 and currentEnemy.name == "ICE BIRD":
+            print("You defeated ICE BIRD")
+            input("It seems to have turned into an egg")
+            return "enemy dead"
+        elif currentEnemy.health <= 0 and currentEnemy.name == "EGG":
+            eggDamage = eggCharge * 10
+            player.health -= eggDamage
+            print("The egg bursts open!")
+            input("Took {} damage!!!".format(eggDamage))
+            return "enemy dead"
+        elif currentEnemy.health <= 0:
             player.gold += currentEnemy.gold
             print("You defeated {}".format(currentEnemy.name))
             if player.health < player.maxHealth:
@@ -690,13 +773,41 @@ def game(player):
                 goldThisRun += currentEnemy.gold
                 if player.swampFirstClear == True:
                     player.swampFirstClear = False
-                    #rewards here
+                    player.crocodileHeart = 1
+                    player.maxHealth += 25
+                    # if you update this please update it in the shop too
                     input("You examine the body of the crocodile...")
-                    input("You found ???!")
+                    input("You found a crocodile heart!")
+                    input("Your maximum health will be increased by 25")
                 elif player.caveFirstClear == False:
-                    #rewards here
+                    crocodileExtraGold = random.randint(200, 300)
+                    player.gold += crocodileExtraGold
                     input("You examine the body of the crocodile...")
-                    input("You found ???!")
+                    input("You found {} extra gold!" .format(crocodileExtraGold))
                 print()
             elif exitCode == "player dead":
                 pass
+
+    #ICE LANDS
+    if player.health > 0:
+        print("You continue into the ice lands")
+        player.walled = False
+        currentEnemy = new_enemy(iceLandsBoss1)
+        print_warning()
+        print("Ice Lands BOSS")
+        exitCode = fighting_enemy_phase()
+        if exitCode == "enemy dead":
+            # bird phase 1 is dead
+            currentEnemy = new_enemy(iceLandsBoss2)
+            exitCode = fighting_enemy_phase()
+            if exitCode == "enemy dead":
+                # bird phase 2 is dead
+                currentEnemy = new_enemy(iceLandsBoss3)
+                exitCode = fighting_enemy_phase()
+                if exitCode == "enemy dead":
+                    # bird phase 3 is dead
+                    input("yay you beat the game")
+                pass
+            print()
+        elif exitCode == "player dead":
+            pass
