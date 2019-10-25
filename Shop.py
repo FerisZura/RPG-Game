@@ -144,7 +144,7 @@ def shop(player):
                     elif player.armourTier == 2:
                         buy(player, platArmour, "armour")
                     elif player.armourTier == 3:
-                        buy(player, finalHelmet, "armour")
+                        buy(player, finalArmour, "armour")
                 elif secondInput == 4:
                     if player.accessoryTier == 0:
                         buy(player, regenBand, "accessory")
