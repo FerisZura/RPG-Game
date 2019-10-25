@@ -100,6 +100,7 @@ def gemsMenu(player, gemList, currentEnemy):
     # unactivates gems
     def unactivateAllGems(gemList):
         print("Unactivating gems...")
+        player.gorillamondShield = False
         for x in range(len(gemList)):
             if gemList[x][2] > 0:
                 # first we lower the stat, then unactivate
@@ -253,14 +254,14 @@ def gemsMenu(player, gemList, currentEnemy):
 
     def gorilla_diamond_effect(combinedGemLevel):
         def lower_enemy_attack(lowerRate):
-            if currentEnemy.attack / currentEnemy.FullAttack > 0.5:
+            if currentEnemy.attack / currentEnemy.FullAttack > 0.5 and currentEnemy.attack > 0:
                 lowerAmount = round(currentEnemy.attack * lowerRate)
                 if lowerAmount == 0:
                     lowerAmount = 1
                 currentEnemy.attack -= lowerAmount
             else:
                 lowerAmount = 0
-            input("(effect: lowered enemy attack by {})".format(lowerAmount))
+            input("(effect: lowered enemy attack by {}. May shield you from some attacks)".format(lowerAmount))
 
         if combinedGemLevel == 1:
             lower_enemy_attack(0.1)
@@ -339,6 +340,7 @@ def gemsMenu(player, gemList, currentEnemy):
             rabbit_tank_effect(combinedGemLevel)
         if gemName12 == GORILLADIAMOND or gemName21 == GORILLADIAMOND:
             gorilla_diamond_effect(combinedGemLevel)
+            player.gorillamondShield = True
         if gemName12 == HAWKGATALING or gemName21 == HAWKGATALING:
             hawk_gatling_effect_charge(combinedGemLevel)
         if gemName12 == NINJACOMIC or gemName21 == NINJACOMIC:
@@ -366,7 +368,7 @@ def game(player):
 
     # sets up enemies
     forestEnemy = enemyType(5, 10, 2, 3, 5, 10, "Snake")
-    forestBoss = enemyType(25, 25, 5, 5, 75, 75, "COBRA")
+    forestBoss = enemyType(25, 25, 5, 5, 100, 100, "COBRA")
     caveEnemy = enemyType(25, 35, 4, 7, 10, 20, "Small Bat")
     caveBoss = enemyType(100, 100, 12, 12, 250, 250, "GIANT BAT")
     swampEnemy = enemyType(80, 100, 10, 15, 50, 70, "Lizard")
@@ -431,16 +433,22 @@ def game(player):
             percentDmg = player.maxHealth//2
             if percentDmg > flatDmg and currentEnemy.name != "ICE BIRD (REVIVE)":
                 player.health -= percentDmg
+                if player.gorillamondShield == True:
+                    percentDmg = (percentDmg//3) * 2
                 print("Took {} damage!!".format(percentDmg))
                 print()
             else:
-                player.health -= percentDmg
+                player.health -= flatDmg
+                if player.gorillamondShield == True:
+                    flatDmg = (flatDmg//3) * 2
                 print("Took {} damage!!".format(flatDmg))
                 print()
             return 0
 
         def boss_use_icicle_charge(dmg):
             player.health -= dmg
+            if player.gorillamondShield == True:
+                dmg -= 10
             print("The icicle does {} damage!" .format(dmg))
             return 0
 
@@ -536,8 +544,12 @@ def game(player):
 
             #glacial storm phase
             if player.glacialStorm == True:
-                player.health -= 10
-                print("The glacial storm does 10 damage!")
+                if player.gorillamondShield == True:
+                    player.health -= 8
+                    print("The glacial storm does 8 damage!")
+                else:
+                    player.health -= 10
+                    print("The glacial storm does 10 damage!")
 
             # enemy phase (skip if they dead or user did not make action)
             if currentEnemy.health <= 0:
@@ -569,7 +581,7 @@ def game(player):
                         print()
                 elif currentEnemy.name == "ICE BIRD":
                     #70% attack
-                    #20% heal for 70
+                    #20% heal for 60 to 80
                     #10% glacial storm
                     rando = random.randint(1,10)
                     if rando <= 1 and player.glacialStorm == False:
@@ -589,7 +601,7 @@ def game(player):
                     print()
                 elif currentEnemy.name == "ICE BIRD (REVIVE)":
                     #60% attack
-                    #10% heal
+                    #10% heal for 60 to 80
                     #10% large attack
                     #10% icicle
                     #10% glacial storm
@@ -603,6 +615,7 @@ def game(player):
                     elif rando <= 1 and player.glacialStorm == False:
                         player.glacialStorm = True
                         print("ICE BIRD summons a glacial storm!")
+                        input("(you can teleport out)")
                     elif rando <2:
                         boss_heal([60, 80])
                     elif rando <3:
@@ -631,6 +644,8 @@ def game(player):
             return "enemy dead"
         elif currentEnemy.health <= 0 and currentEnemy.name == "EGG":
             eggDamage = eggCharge * 10
+            if player.gorillamondShield == True:
+                eggDamage = eggCharge * 8
             player.health -= eggDamage
             print("The egg bursts open!")
             input("Took {} damage!!!".format(eggDamage))
